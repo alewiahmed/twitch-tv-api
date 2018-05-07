@@ -5,11 +5,18 @@ import $ from 'jquery';
 
 class App extends Component {
   state = {
+    filter: 'all',
     usersData: []
   };
   componentWillMount() {
     this.getUserData();
   }
+
+  toggleFilter = filter => {
+    this.setState({
+      filter
+    });
+  };
 
   getUserData = async () => {
     let users = [
@@ -32,6 +39,7 @@ class App extends Component {
       });
     });
   };
+
   fetch = async (type, userName) => {
     const URL = `https://wind-bow.gomix.me/twitch-api/${type}/${userName}?callback=?`;
     try {
@@ -41,15 +49,46 @@ class App extends Component {
     }
   };
 
+  showFilter = () => {
+    let { filter } = this.state;
+    return (
+      <div className="filter-container">
+        <button
+          onClick={() => this.toggleFilter('all')}
+          className={filter === 'all' ? 'selected' : ''}
+        >
+          All
+        </button>
+        <button
+          onClick={() => this.toggleFilter('online')}
+          className={filter === 'online' ? 'selected' : ''}
+        >
+          Online
+        </button>
+        <button
+          onClick={() => this.toggleFilter('offline')}
+          className={filter === 'offline' ? 'selected' : ''}
+        >
+          Offline
+        </button>
+      </div>
+    );
+  };
+
   showUsers = () => {
-    let { usersData } = this.state;
+    let { usersData, filter } = this.state;
     if (!usersData.length) return null;
     let usersUI = usersData
       .filter(user => {
-        return user.channels.error === undefined;
+        let truth = user.channels.error === undefined;
+        if (filter === 'online') {
+          truth = truth && user.streams.stream !== null;
+        } else if (filter === 'offline') {
+          truth = truth && user.streams.stream === null;
+        }
+        return truth;
       })
       .map((user, index) => {
-        console.log(user);
         let name = user.channels.display_name;
         let statusClass =
           user.streams.stream !== null ? 'status online' : 'status';
@@ -93,7 +132,10 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <div className="container">{this.showUsers()}</div>
+        <div className="container">
+          {this.showFilter()}
+          {this.showUsers()}
+        </div>
       </div>
     );
   }
