@@ -50,7 +50,8 @@ class App extends Component {
   };
 
   showFilter = () => {
-    let { filter } = this.state;
+    let { filter, usersData } = this.state;
+    if (!usersData.length) return null;
     return (
       <div className="filter-container">
         <button
@@ -71,6 +72,40 @@ class App extends Component {
         >
           Offline
         </button>
+      </div>
+    );
+  };
+
+  inputBlured = () => {
+    this.setState({
+      searchActive: false
+    });
+    this.searchInput.value = '';
+  };
+
+  inputFocused = () => {
+    this.setState({
+      searchActive: true
+    });
+  };
+
+  showSearch = () => {
+    let { usersData, searchActive } = this.state;
+    // if (!usersData.length) return null;
+    let searchClass = searchActive ? 'search active' : 'search';
+    return (
+      <div className="search-container">
+        <div
+          class={searchClass}
+          onBlur={this.inputBlured}
+          onFocus={this.inputFocused}
+        >
+          <input
+            id="inpt_search"
+            type="text"
+            ref={r => (this.searchInput = r)}
+          />
+        </div>
       </div>
     );
   };
@@ -133,6 +168,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className="container">
+          {this.showSearch()}
           {this.showFilter()}
           {this.showUsers()}
         </div>

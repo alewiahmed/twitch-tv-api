@@ -125,3 +125,54 @@
 .App-title {
   font-size: 1.5em;
 }
+
+.search-container {
+  padding: 23px;
+  margin-bottom: 20px;
+  background-color: #2196f3;
+}
+.search {
+  width: 35px;
+  cursor: text;
+  height: 35px;
+  color: #27004c;
+  position: relative;
+  border-radius: 25px;
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 4px 9px 0px 9px;
+  transition: all 200ms ease;
+  border: 3px solid #27004c;
+}
+.search:after {
+  top: 21px;
+  width: 3px;
+  right: -5px;
+  content: '';
+  height: 20px;
+  position: absolute;
+  border-radius: 3px;
+  background: #27004c;
+  transform: rotate(-45deg);
+  transition: all 200ms ease;
+  -webkit-transform: rotate(-45deg);
+}
+.search.active,
+.search:hover {
+  width: 80%;
+  margin-right: 0px;
+}
+.search.active:after,
+.search:hover:after {
+  height: 0px;
+}
+.search input {
+  width: 100%;
+  border: none;
+  color: inherit;
+  font-size: 15px;
+  outline-width: 0px;
+  box-sizing: border-box;
+  font-family: Helvetica;
+  background: transparent;
+}
