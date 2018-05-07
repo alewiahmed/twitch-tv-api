@@ -42,30 +42,38 @@ class App extends Component {
   };
 
   showUsers = () => {
-    let usersUI = users
+    let { usersData } = this.state;
+    if (!usersData.length) return null;
+    let usersUI = usersData
       .filter(user => {
-        return user.error === undefined;
+        return user.channels.error === undefined;
       })
       .map((user, index) => {
-        let name =
-          user.stream !== null ? user.stream.display_name : user.display_name;
-        let statusClass = user.stream !== null ? 'status online' : 'status';
+        console.log(user);
+        let name = user.channels.display_name;
+        let statusClass =
+          user.streams.stream !== null ? 'status online' : 'status';
         let stream =
-          user.stream !== null ? (
+          user.streams.stream !== null ? (
             <p>
-              <span>Streaming:</span>
-              {` ${user.stream.status}`}
+              <span className="streaming">Streaming: </span>
+              {`${user.streams.stream.channel.status}`}
             </p>
-          ) : null;
+          ) : (
+            <p>
+              <span>Recent Stream: </span>
+              {`${user.channels.status ? user.channels.status : 'None'}`}
+            </p>
+          );
         return (
           <a
             key={index}
             target="_blank"
             className="single-user"
-            href={user._links.channel}
+            href={user.channels.url}
           >
             <div className="row">
-              <img alt="avatar" />
+              <img src={user.channels.logo} alt="avatar" />
               <div className="column">
                 <h4>{name}</h4>
                 {stream}
@@ -75,6 +83,10 @@ class App extends Component {
           </a>
         );
       });
+    if (!usersUI.length)
+      return (
+        <div className="users-container">Nothing to show at this time</div>
+      );
     return <div className="users-container">{usersUI}</div>;
   };
 
