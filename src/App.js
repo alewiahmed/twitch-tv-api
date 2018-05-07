@@ -1,8 +1,46 @@
 import React, { Component } from 'react';
 import './App.css';
 import users from './users.json';
+import $ from 'jquery';
 
 class App extends Component {
+  state = {
+    usersData: []
+  };
+  componentWillMount() {
+    this.getUserData();
+  }
+
+  getUserData = async () => {
+    let users = [
+      'ESL_SC2',
+      'OgamingSC2',
+      'cretetion',
+      'freecodecamp',
+      'storbeck',
+      'habathcx',
+      'RobotCaleb',
+      'noobs2ninjas'
+    ];
+
+    users.forEach(async user => {
+      let channels = await this.fetch('channels', user);
+      let streams = await this.fetch('streams', user);
+      this.setState(state => {
+        state.usersData.push({ user, channels, streams });
+        return state;
+      });
+    });
+  };
+  fetch = async (type, userName) => {
+    const URL = `https://wind-bow.gomix.me/twitch-api/${type}/${userName}?callback=?`;
+    try {
+      return await $.getJSON(URL);
+    } catch (e) {
+      return { error: e };
+    }
+  };
+
   showUsers = () => {
     let usersUI = users
       .filter(user => {
