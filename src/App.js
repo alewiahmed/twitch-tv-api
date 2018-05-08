@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import './App.css';
-import users from './users.json';
 import $ from 'jquery';
 
 class App extends Component {
@@ -148,6 +147,7 @@ class App extends Component {
     this.setState({
       searchTerm: '',
       isSearch: false,
+      searchResult: [],
       searchActive: false
     });
     this.searchInput.value = '';
