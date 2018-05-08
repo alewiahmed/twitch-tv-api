@@ -168,6 +168,7 @@ class App extends Component {
     return (
       <div className="App">
         <div className="container">
+          <h1 className="header">Twitch Streamers</h1>
           {this.showSearch()}
           {this.showFilter()}
           {this.showUsers()}
