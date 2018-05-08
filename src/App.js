@@ -5,9 +5,11 @@ import $ from 'jquery';
 
 class App extends Component {
   state = {
+    error: '',
     filter: 'all',
     usersData: [],
     searchTerm: '',
+    loading: false,
     isSearch: false,
     searchResult: [],
     searchActive: false
@@ -33,10 +35,13 @@ class App extends Component {
       'RobotCaleb',
       'noobs2ninjas'
     ];
-
-    users.forEach(async user => {
+    this.setState({
+      loading: true
+    });
+    users.forEach(async (user, index) => {
       let channels = await this.fetch('channels', user);
       let streams = await this.fetch('streams', user);
+      if (index === users.length - 1) this.setState({ loading: false });
       this.setState(state => {
         state.usersData.push({ user, channels, streams });
         return state;
@@ -51,6 +56,27 @@ class App extends Component {
     } catch (e) {
       return { error: e };
     }
+  };
+
+  showSpinner = () => {
+    let { loading } = this.state;
+    if (!loading) return null;
+    return (
+      <div className="sk-circle">
+        <div className="sk-circle1 sk-child" />
+        <div className="sk-circle2 sk-child" />
+        <div className="sk-circle3 sk-child" />
+        <div className="sk-circle4 sk-child" />
+        <div className="sk-circle5 sk-child" />
+        <div className="sk-circle6 sk-child" />
+        <div className="sk-circle7 sk-child" />
+        <div className="sk-circle8 sk-child" />
+        <div className="sk-circle9 sk-child" />
+        <div className="sk-circle10 sk-child" />
+        <div className="sk-circle11 sk-child" />
+        <div className="sk-circle12 sk-child" />
+      </div>
+    );
   };
 
   showFilter = () => {
@@ -105,6 +131,7 @@ class App extends Component {
         .includes(searchTerm.toLowerCase());
     });
     this.setState({
+      filter: 'all',
       isSearch: true,
       searchResult: [...result1, ...result2]
     });
@@ -128,7 +155,7 @@ class App extends Component {
 
   showSearchForm = () => {
     let { usersData, searchActive } = this.state;
-    // if (!usersData.length) return null;
+    if (!usersData.length) return null;
     let searchClass = searchActive ? 'search active' : 'search';
     return (
       <div className="search-container">
@@ -217,6 +244,7 @@ class App extends Component {
           {this.showSearchForm()}
           {this.showFilter()}
           {this.showUsers()}
+          {this.showSpinner()}
         </div>
       </div>
     );
