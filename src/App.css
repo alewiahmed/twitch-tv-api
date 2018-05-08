@@ -181,3 +181,50 @@
   font-family: Helvetica;
   background: transparent;
 }
+
+.search .del {
+  top: 50%;
+  left: 50%;
+  border: 0;
+  padding: 0;
+  width: 50px;
+  height: 50px;
+  display: none;
+  outline: none;
+  color: inherit;
+  cursor: pointer;
+  background: none;
+  position: absolute;
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+}
+
+.search .del:before {
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  content: '';
+  height: 35.5px;
+  position: absolute;
+  background: #27004c;
+  transform: translate(-50%, -50%) rotate(-45deg) scaleY(0.7);
+}
+.search .del:after {
+  top: 50%;
+  left: 50%;
+  width: 2px;
+  content: '';
+  height: 35.5px;
+  position: absolute;
+  background: #27004c;
+  transform: translate(-50%, -50%) rotate(45deg) scaleY(0.7);
+}
+
+.search.active .del {
+  display: initial;
+  left: calc(100% - 25px);
+}
+
+.search .del:focus {
+  outline: none;
+}

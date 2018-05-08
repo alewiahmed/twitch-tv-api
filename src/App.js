@@ -6,7 +6,11 @@ import $ from 'jquery';
 class App extends Component {
   state = {
     filter: 'all',
-    usersData: []
+    usersData: [],
+    searchTerm: '',
+    isSearch: false,
+    searchResult: [],
+    searchActive: false
   };
   componentWillMount() {
     this.getUserData();
@@ -58,29 +62,27 @@ class App extends Component {
           onClick={() => this.toggleFilter('all')}
           className={filter === 'all' ? 'selected' : ''}
         >
-          All
+          ALL
         </button>
         <button
           onClick={() => this.toggleFilter('online')}
           className={filter === 'online' ? 'selected' : ''}
         >
-          Online
+          ONLINE
         </button>
         <button
           onClick={() => this.toggleFilter('offline')}
           className={filter === 'offline' ? 'selected' : ''}
         >
-          Offline
+          OFFLINE
         </button>
       </div>
     );
   };
 
-  inputBlured = () => {
-    this.setState({
-      searchActive: false
-    });
-    this.searchInput.value = '';
+  inputBlured = e => {
+    if (e.target.value !== '') return;
+    this.resetInput(e);
   };
 
   inputFocused = () => {
@@ -89,30 +91,104 @@ class App extends Component {
     });
   };
 
-  showSearch = () => {
+  search = e => {
+    let { searchTerm, usersData } = this.state;
+    e.preventDefault();
+    if (!searchTerm || !usersData.length) return;
+    let result1 = usersData.filter(single => {
+      return single.user.toLowerCase().includes(searchTerm.toLowerCase());
+    });
+    let result2 = usersData.filter(single => {
+      if (single.channels.status === null) return false;
+      return single.channels.status
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase());
+    });
+    this.setState({
+      isSearch: true,
+      searchResult: [...result1, ...result2]
+    });
+  };
+
+  inputChanged = e => {
+    this.setState({
+      searchTerm: e.target.value
+    });
+  };
+
+  resetInput = e => {
+    e.preventDefault();
+    this.setState({
+      searchTerm: '',
+      isSearch: false,
+      searchActive: false
+    });
+    this.searchInput.value = '';
+  };
+
+  showSearchForm = () => {
     let { usersData, searchActive } = this.state;
     // if (!usersData.length) return null;
     let searchClass = searchActive ? 'search active' : 'search';
     return (
       <div className="search-container">
-        <div
-          class={searchClass}
+        <form
+          onSubmit={this.search}
+          className={searchClass}
           onBlur={this.inputBlured}
           onFocus={this.inputFocused}
+          onChange={this.inputChanged}
         >
-          <input
-            id="inpt_search"
-            type="text"
-            ref={r => (this.searchInput = r)}
-          />
-        </div>
+          <input ref={r => (this.searchInput = r)} />
+          <button className="del" type="reset" onClick={this.resetInput} />
+        </form>
       </div>
     );
   };
 
+  showSearchResult = () => {
+    let { usersData } = this.state;
+    if (!usersData) return null;
+  };
+
+  singleUser = (user, index) => {
+    let name = user.channels.display_name;
+    let statusClass = user.streams.stream !== null ? 'status online' : 'status';
+    let stream =
+      user.streams.stream !== null ? (
+        <p>
+          <span className="streaming">Streaming: </span>
+          {`${user.streams.stream.channel.status}`}
+        </p>
+      ) : (
+        <p>
+          <span>Recent Stream: </span>
+          {`${user.channels.status ? user.channels.status : 'None'}`}
+        </p>
+      );
+    return (
+      <a
+        key={index}
+        target="_blank"
+        className="single-user"
+        href={user.channels.url}
+      >
+        <div className="row">
+          <img src={user.channels.logo} alt="avatar" />
+          <div className="column">
+            <h4>{name}</h4>
+            {stream}
+          </div>
+        </div>
+        <div className={statusClass} />
+      </a>
+    );
+  };
+
   showUsers = () => {
-    let { usersData, filter } = this.state;
+    let { usersData, filter, searchResult, isSearch } = this.state;
     if (!usersData.length) return null;
+    usersData = isSearch ? searchResult : usersData;
     let usersUI = usersData
       .filter(user => {
         let truth = user.channels.error === undefined;
@@ -124,38 +200,7 @@ class App extends Component {
         return truth;
       })
       .map((user, index) => {
-        let name = user.channels.display_name;
-        let statusClass =
-          user.streams.stream !== null ? 'status online' : 'status';
-        let stream =
-          user.streams.stream !== null ? (
-            <p>
-              <span className="streaming">Streaming: </span>
-              {`${user.streams.stream.channel.status}`}
-            </p>
-          ) : (
-            <p>
-              <span>Recent Stream: </span>
-              {`${user.channels.status ? user.channels.status : 'None'}`}
-            </p>
-          );
-        return (
-          <a
-            key={index}
-            target="_blank"
-            className="single-user"
-            href={user.channels.url}
-          >
-            <div className="row">
-              <img src={user.channels.logo} alt="avatar" />
-              <div className="column">
-                <h4>{name}</h4>
-                {stream}
-              </div>
-            </div>
-            <div className={statusClass} />
-          </a>
-        );
+        return this.singleUser(user, index);
       });
     if (!usersUI.length)
       return (
@@ -169,7 +214,7 @@ class App extends Component {
       <div className="App">
         <div className="container">
           <h1 className="header">Twitch Streamers</h1>
-          {this.showSearch()}
+          {this.showSearchForm()}
           {this.showFilter()}
           {this.showUsers()}
         </div>
