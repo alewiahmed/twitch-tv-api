@@ -199,6 +199,7 @@ class App extends Component {
         target="_blank"
         className="single-user"
         href={user.channels.url}
+        rel="noopener noreferrer"
       >
         <div className="row">
           <img src={user.channels.logo} alt="avatar" />
