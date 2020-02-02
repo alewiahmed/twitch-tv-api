@@ -13,7 +13,7 @@ class App extends Component {
     searchResult: [],
     searchActive: false
   };
-  componentWillMount() {
+  componentDidMount() {
     this.getUserData();
   }
 
